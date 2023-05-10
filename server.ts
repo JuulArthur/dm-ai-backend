@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { Configuration, OpenAIApi } from "openai";
+import textToSpeech from "@google-cloud/text-to-speech";
 //import {ChatGPTUnofficialProxyAPI} from 'chatgpt';
 
 const Request = express.Request;
@@ -13,12 +14,12 @@ config();
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-console.log(" process.env.OPENAI_API_KEY", process.env.OPENAI_API_KEY);
 const openai = new OpenAIApi(configuration);
 /*const ChatGPT = new ChatGPTUnofficialProxyAPI({
     accessToken: process.env.OPENAI_API_KEY || '',
 })*/
+
+const textToSpeechClient = new textToSpeech.TextToSpeechClient();
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -75,6 +76,25 @@ app.post("/api/chatgpt", async (req, res) => {
 
   const response = completions.data?.choices[0]?.message;
   console.log("response", response);
+
+  /*
+  // Construct the request
+  const textToSpeechRequest = {
+    input: { text: response?.content },
+    // Select the language and SSML voice gender (optional)
+    voice: { languageCode: "en-US", ssmlGender: "NEUTRAL" },
+    // select the type of audio encoding
+    audioConfig: { audioEncoding: "MP3" },
+  };
+  // @ts-ignore
+  const [textToSpeechResponse] = await textToSpeechClient.synthesizeSpeech(
+    //@ts-ignore
+    textToSpeechRequest
+  );
+  console.log(
+    "textToSpeechResponse.audioContent",
+    textToSpeechResponse.audioContent
+  );*/
 
   return res.send({ response });
 });
